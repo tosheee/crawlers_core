@@ -1,6 +1,9 @@
 from mysql_connection import MysqlConnection
 import json
 from datetime import datetime
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class DbMysqlPipeline(MysqlConnection):
@@ -10,16 +13,16 @@ class DbMysqlPipeline(MysqlConnection):
         item['content']['status'] = status
 
         if status == 'No changed':
-            print("\nTHE ARTICLE IS OLD AND NOT UPDATED\n")
+            logger.info("THE ARTICLE IS OLD AND NOT UPDATED")
             return item
 
         if status == 'Updated offer':
-            print("\nTHE ARTICLE WILL BE UPDATED\n")
+            logger.info("\nTHE ARTICLE WILL BE UPDATED\n")
             self.update_item(item)
             return item
 
         if status == 'New offer':
-            print("\nTHE ARTICLE IS NEW\n")
+            logger.info("\nTHE ARTICLE IS NEW\n")
             self.insert_item(item)
 
         return item
@@ -39,8 +42,8 @@ class DbMysqlPipeline(MysqlConnection):
                 continue
 
             if old_item_content.get(key, '') != val:
-                print(f'THE FIELD {key} is UPDATED')
-                print(f'Value: {val}')
+                logger.info(f'THE FIELD {key} is UPDATED')
+                logger.info(f'Value: {val}')
                 updated_fields.append({key: val})
 
         return 'Updated offer' if updated_fields else 'No changed'
